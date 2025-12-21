@@ -10,22 +10,31 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Video {
+  id          String   @id @default(cuid())
+  youtubeId   String   @unique
+  title       String?
+  transcript  String?  @db.Text
+  sessions    ChatSession[]
+  createdAt   DateTime @default(now())
 }
 
 model ChatSession {
-  id String @id @default(cuid())
-  videoUrl String
-  videoId String
-  createdAt DateTime @default(now())
-  message Message[]
+  id        String    @id @default(cuid())
+  videoId   String
+  video     Video     @relation(fields: [videoId], references: [id])
+  messages  Message[]
+  createdAt DateTime  @default(now())
 }
 
 model Message {
-  id String @id @default(cuid())
-  content String
-  role String // User or Assistant
+  id            String      @id @default(cuid())
+  role          String      // "user" or "assistant"
+  content       String      @db.Text
   chatSessionId String
-  chatSession ChatSession @relation(fields: [chatSessionId], references: [id])
-  createdAt DateTime @default(now())
+  chatSession   ChatSession @relation(fields: [chatSessionId], references: [id])
+  createdAt     DateTime    @default(now())
 }
-
