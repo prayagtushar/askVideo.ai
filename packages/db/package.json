@@ -1,0 +1,21 @@
+{
+	"name": "@repo/db",
+	"version": "0.0.1",
+	"private": true,
+	"main": "dist/src/index.js",
+	"types": "dist/src/index.d.ts",
+	"scripts": {
+		"build": "tsc",
+		"generate": "prisma generate",
+		"migrate": "prisma migrate dev",
+		"studio": "prisma studio"
+	},
+	"dependencies": {
+		"@prisma/client": "^5.22.0",
+		"@types/node": "^25.0.3",
+		"dotenv": "^17.2.3"
+	},
+	"devDependencies": {
+		"prisma": "^5.22.0"
+	}
+}
