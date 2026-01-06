@@ -29,7 +29,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
 	};
 
 	return (
-		<div className='flex w-full items-center gap-2 border-t bg-background p-4'>
+		<div className='flex w-full items-center gap-2 p-4 pt-2'>
 			<Input
 				ref={inputRef}
 				placeholder='Ask something about the video...'

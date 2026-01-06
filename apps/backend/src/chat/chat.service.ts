@@ -36,6 +36,7 @@ export class ChatService {
       video = await this.prisma.client.video.create({
         data: {
           youtubeId: videoId,
+          title,
           transcript,
         },
       });
@@ -65,10 +66,21 @@ export class ChatService {
       }
     }
 
+    const sessionCount = await this.prisma.client.chatSession.count();
+    const defaultTitle = `Video ${sessionCount + 1}`;
+
     return this.prisma.client.chatSession.create({
       data: {
         videoId: video.id,
+        title: defaultTitle,
       },
+    });
+  }
+
+  async updateSessionTitle(sessionId: string, title: string) {
+    return this.prisma.client.chatSession.update({
+      where: { id: sessionId },
+      data: { title },
     });
   }
   async handleUserMessage(sessionId: string, userMessage: string) {
@@ -118,6 +130,23 @@ export class ChatService {
         messages: {
           orderBy: { createdAt: 'asc' },
         },
+        video: true,
+      },
+    });
+  }
+
+  async listSessions() {
+    return this.prisma.client.chatSession.findMany({
+      include: {
+        video: {
+          select: {
+            title: true,
+            youtubeId: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }

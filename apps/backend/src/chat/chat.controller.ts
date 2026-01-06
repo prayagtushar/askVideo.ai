@@ -23,4 +23,16 @@ export class ChatController {
     // Return history so user can refresh the page and stay in chat
     return this.chatService.getSessionWithHistory(id);
   }
+
+  @Get('sessions')
+  async listSessions() {
+    return this.chatService.listSessions();
+  }
+  @Post(':sessionId/title')
+  async updateTitle(
+    @Param('sessionId') sessionId: string,
+    @Body('title') title: string,
+  ) {
+    return this.chatService.updateSessionTitle(sessionId, title);
+  }
 }

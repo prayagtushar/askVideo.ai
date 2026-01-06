@@ -11,12 +11,12 @@ export function ChatPage() {
 	if (!id) return <div>Invalid Session</div>;
 
 	return (
-		<div className='flex h-[calc(100vh-3.5rem)] flex-col'>
-			<div className='flex-1 overflow-hidden p-4'>
-				<div className='mx-auto flex h-full max-w-3xl flex-col rounded-xl border bg-card shadow-sm'>
+		<div className='h-screen flex flex-col pt-14 md:pt-0'>
+			<div className='flex-1 overflow-hidden p-2 md:p-6'>
+				<div className='mx-auto flex h-full max-w-5xl flex-col rounded-3xl glass overflow-hidden border border-white/5'>
 					<ChatWindow messages={messages} loading={loading} />
 					{error && (
-						<div className='bg-destructive/10 p-2 text-center text-sm text-destructive'>
+						<div className='bg-red-500/10 p-3 text-center text-sm text-red-400 font-medium'>
 							{error}
 						</div>
 					)}

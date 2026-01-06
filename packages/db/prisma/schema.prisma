@@ -24,6 +24,7 @@ model Video {
 
 model ChatSession {
   id        String    @id @default(cuid())
+  title     String?
   videoId   String
   video     Video     @relation(fields: [videoId], references: [id])
   messages  Message[]

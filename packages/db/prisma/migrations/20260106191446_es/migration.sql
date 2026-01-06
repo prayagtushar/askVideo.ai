@@ -12,6 +12,7 @@ CREATE TABLE "Video" (
 -- CreateTable
 CREATE TABLE "ChatSession" (
     "id" TEXT NOT NULL,
+    "title" TEXT,
     "videoId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

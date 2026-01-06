@@ -17,22 +17,26 @@ export function MessageBubble({ message }: MessageBubbleProps) {
 			)}>
 			<div
 				className={cn(
-					'flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full border',
-					isUser ? 'bg-primary text-primary-foreground' : 'bg-muted'
+					'flex h-10 w-10 shrink-0 select-none items-center justify-center rounded-xl glass',
+					isUser ? 'bg-primary/20' : 'bg-white/5'
 				)}>
-				{isUser ? <User className='h-4 w-4' /> : <Bot className='h-4 w-4' />}
+				{isUser ? (
+					<User className='h-5 w-5' />
+				) : (
+					<Bot className='h-5 w-5 text-blue-400' />
+				)}
 			</div>
 			<div
 				className={cn(
-					'flex min-w-0 max-w-[80%] flex-col gap-1',
+					'flex min-w-0 max-w-[85%] flex-col gap-1',
 					isUser && 'items-end'
 				)}>
 				<div
 					className={cn(
-						'whitespace-pre-wrap rounded-lg px-4 py-2 break-words',
+						'whitespace-pre-wrap rounded-2xl px-5 py-3 break-words shadow-lg',
 						isUser
 							? 'bg-primary text-primary-foreground'
-							: 'bg-muted text-muted-foreground'
+							: 'glass-card text-foreground/90'
 					)}>
 					{message.content}
 				</div>
