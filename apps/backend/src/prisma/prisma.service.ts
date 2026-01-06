@@ -3,15 +3,13 @@ import { db } from '@repo/db';
 
 @Injectable()
 export class PrismaService implements OnModuleInit, OnModuleDestroy {
+  public client = db;
+
   async onModuleInit() {
-    await db.$connect();
+    await this.client.$connect();
   }
 
   async onModuleDestroy() {
-    await db.$disconnect();
-  }
-
-  get client() {
-    return db;
+    await this.client.$disconnect();
   }
 }

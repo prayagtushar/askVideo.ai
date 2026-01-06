@@ -1,9 +1,19 @@
 import { Module } from '@nestjs/common';
-import { ChatService } from './chat.service';
+import { GoogleService } from 'src/common/gemini.service';
+import { PineconeService } from 'src/common/pinecone.service';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { YoutubeService } from 'src/youtube/youtube.service';
 import { ChatController } from './chat.controller';
+import { ChatService } from './chat.service';
+
 @Module({
-  imports: [],
   controllers: [ChatController],
-  providers: [ChatService],
+  providers: [
+    ChatService,
+    PrismaService,
+    YoutubeService,
+    PineconeService,
+    GoogleService,
+  ],
 })
 export class ChatModule {}
