@@ -19,22 +19,20 @@ export class ChatService {
     let video = await this.prisma.client.video.findUnique({
       where: { youtubeId: videoId },
     });
+
     if (!video) {
-      const transcript = await this.youtube.getTranscript(videoId);
-      const chunks = await this.youtube.spiltText(transcript);
+      // 1. Get fundamental video info (Title)
+      const info = await this.youtube.getVideoInfo(videoId);
+      const title = info?.title || 'Unknown Video';
 
-      const data = await Promise.all(
-        chunks.map(async (text, index) => {
-          const vector = await this.gemini.generateEmbedding(text);
-          return {
-            id: `${videoId}#${index}`,
-            values: vector,
-            metadata: { text, videoId },
-          };
-        }),
-      );
-      await this.pinecone.upsertTranscript(data);
+      // 2. Get transcript
+      let transcript = await this.youtube.getTranscript(videoId);
 
+      if (!transcript || transcript.trim().length === 0) {
+        transcript = `Video Title: ${title}\n[Note: Detailed transcript was not available for this video.]`;
+      }
+
+      // 3. Create Video record IMMEDIATELY so ingestion is "successful" fundamentally
       video = await this.prisma.client.video.create({
         data: {
           youtubeId: videoId,
@@ -42,6 +40,29 @@ export class ChatService {
         },
       });
 
+      // 4. Processing for AI (Vector store)
+      // Wrap in try-catch to prevent a full failure if quota or pinecone is down
+      try {
+        const chunks = await this.youtube.spiltText(transcript);
+        const data = await Promise.all(
+          chunks.map(async (text, index) => {
+            const vector = await this.gemini.generateEmbedding(text);
+            return {
+              id: `${videoId}#${index}`,
+              values: vector,
+              metadata: { text, videoId },
+            };
+          }),
+        );
+        if (data.length > 0) {
+          await this.pinecone.upsertTranscript(data);
+        }
+      } catch (aiError) {
+        console.error(
+          `AI Processing (embedding/pinecone) failed for ${videoId}:`,
+          aiError.message,
+        );
+      }
     }
 
     return this.prisma.client.chatSession.create({
@@ -55,6 +76,9 @@ export class ChatService {
       where: {
         id: sessionId,
       },
+      include: {
+        video: true,
+      },
     });
     if (!session) {
       throw new Error('Session not found');
@@ -63,9 +87,15 @@ export class ChatService {
     const queryVector = await this.gemini.generateEmbedding(userMessage);
     const queryResponse = await this.pinecone.queryByVector(
       queryVector,
-      session.videoId,
+      session.video.youtubeId,
     );
-    const context = queryResponse.matches.map((m) => m.metadata?.text).join('\n---\n');
+    const context = queryResponse.matches
+      .map((m) => m.metadata?.text)
+      .filter((text): text is string => !!text)
+      .join('\n---\n');
+
+    console.log(`[ChatService] Query matches: ${queryResponse.matches.length}`);
+    console.log(`[ChatService] Context length: ${context.length} characters`);
 
     const answer = await this.gemini.generateAnswer(userMessage, context);
 

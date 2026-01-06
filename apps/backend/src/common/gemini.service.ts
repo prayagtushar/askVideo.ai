@@ -14,13 +14,18 @@ export class GoogleService {
       model: 'text-embedding-004',
     });
 
-    const result = await model.embedContent(text);
-    return result.embedding.values;
+    try {
+      const result = await model.embedContent(text);
+      return result.embedding.values;
+    } catch (error) {
+      console.error('Gemini Embedding Error:', error.message);
+      throw error;
+    }
   }
 
   async generateAnswer(question: string, context: string) {
     const model = this.ai.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash',
     });
 
     const prompt = `
